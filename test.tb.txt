@@ -1,8 +1,6 @@
 You are now connected to database "nc_news_test" as user "mark".
- slug  |          description           
--------+--------------------------------
- mitch | The man, the Mitch, the legend
- cats  | Not dogs
- paper | what books are made of
-(3 rows)
+ article_id |                title                | topic |    author     |               body                |     created_at      | votes 
+------------+-------------------------------------+-------+---------------+-----------------------------------+---------------------+-------
+          1 | Living in the shadow of a great man | mitch | butter_bridge | I find this existence challenging | 2020-07-09 21:11:00 |   100
+(1 row)
 

@@ -1,3 +1,3 @@
 \c nc_news_test
 
-SELECT * FROM topics;
+SELECT * FROM articles WHERE article_id = 1;

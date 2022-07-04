@@ -38,5 +38,25 @@ describe("GET /api/topics", () => {
         });
       });
   });
+});
 
+describe('2. GET /api/articles/:article_id', () => {
+  test('status:200, responds with a single matching article', () => {
+    const article_ID = 1;
+    return request(app)
+      .get(`/api/articles/${article_ID}`)
+      .expect(200)
+      .then(({ body }) => {
+        const { article } = body;
+        expect (article).toHaveProperty('author');
+        expect (article.author).toBe('butter_bridge')
+        expect (article).toHaveProperty('title');
+        expect (article).toHaveProperty('article_id');
+        expect (article.article_id).toBe(1);
+        expect (article).toHaveProperty('body');
+        expect (article).toHaveProperty('topic');
+        expect (article).toHaveProperty('created_at');
+        expect (article).toHaveProperty('votes');
+      });
+  });
 });

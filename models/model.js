@@ -16,3 +16,9 @@ exports.updateArticle = (articleID, inc_votes) => {
   const query = 'UPDATE articles SET votes = votes + $2 WHERE article_id = $1 RETURNING * ;'
   return db.query(query, [articleID, inc_votes]).then(({rows}) => rows[0])
 }
+
+exports.selectUsers = () => {
+  return db.query('SELECT * FROM users;').then((result) => {
+    return result.rows;
+  })
+}

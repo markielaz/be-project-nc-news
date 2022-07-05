@@ -40,7 +40,7 @@ describe("GET /api/topics", () => {
   });
 });
 
-describe('2. GET /api/articles/:article_id', () => {
+describe('GET /api/articles/:article_id', () => {
   test('status:200, responds with a single matching article', () => {
     const article_ID = 1;
     return request(app)
@@ -59,4 +59,45 @@ describe('2. GET /api/articles/:article_id', () => {
         expect (article).toHaveProperty('votes');
       });
   });
+});
+
+describe('PATCH /api/articles/:article_id', () => {
+  test('STATUS CODE 200, and responds with the patched article', () => {
+      const articleID = 1
+      const articleUpdates = {
+          "inc_votes" : 1
+      };
+      return request(app)
+      .patch(`/api/articles/${articleID}`)
+      .send(articleUpdates)
+      .expect(200)
+      .then(({body}) => {
+        const { article } = body;
+        expect (article.article_id).toBe(1);
+        expect (article.votes).toBe(101);
+      }).then(() => {
+          return db.query('SELECT * FROM articles WHERE article_id = 1').then((results) => {
+              expect(results.rows[0].votes).toBe(101);
+          });
+      });
+  });
+  test('STATUS CODE 200, updating the votes with a negative number', () => {
+    const articleID = 1
+    const articleUpdates = {
+        "inc_votes" : -50
+    };
+    return request(app)
+    .patch(`/api/articles/${articleID}`)
+    .send(articleUpdates)
+    .expect(200)
+    .then(({body}) => {
+      const { article } = body;
+      expect (article.article_id).toBe(1);
+      expect (article.votes).toBe(50);
+    }).then(() => {
+        return db.query('SELECT * FROM articles WHERE article_id = 1').then((results) => {
+            expect(results.rows[0].votes).toBe(50);
+        });
+    });
+});
 });

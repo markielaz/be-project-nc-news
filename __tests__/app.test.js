@@ -59,6 +59,17 @@ describe('GET /api/articles/:article_id', () => {
         expect (article).toHaveProperty('votes');
       });
   });
+  test('status:200, reponds with matching article AND response object should also include comment count', () => {
+    const article_ID = 1;
+    return request(app)
+    .get(`/api/articles/${article_ID}`)
+    .expect(200)
+    .then(({body}) => {
+      const {article} = body;
+      expect (article).toHaveProperty('comment_count');
+      expect (article.comment_count).toBe(11);
+    })
+  })
 });
 
 describe('PATCH /api/articles/:article_id', () => {

@@ -3,6 +3,7 @@ const testData = require("../db/data/test-data");
 const db = require("../db/connection");
 const request = require("supertest");
 const app = require("../app");
+require('jest-sorted');
 
 // before we run each test make sure the database is seeded
 beforeEach(() => {
@@ -128,6 +129,36 @@ describe('GET /api/users', () => {
             username: expect.any(String),
             name: expect.any(String),
             avatar_url: expect.any(String)
+          })
+        )
+      })
+    })
+  })
+})
+
+describe('GET /api/articles', () => {
+  test('status of 200, responds with an articles array of article objects, sorted by date in descending order', () => {
+    return request.agent(app)
+    .get('/api/articles')
+    .expect(200)
+    .then(({body}) => {
+      const {articles} = body;
+      expect(articles).toBeInstanceOf(Array);
+      expect(articles.length).toBe(12);
+      expect(articles).toBeSortedBy('created_at', {
+        descending: true,
+        coerce: true,
+      })
+      articles.forEach((article) => {
+        expect(article).toEqual(
+          expect.objectContaining({
+            author: expect.any(String),
+            title: expect.any(String),
+            article_id: expect.any(Number),
+            topic: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            comment_count: expect.any(Number)
           })
         )
       })

@@ -138,7 +138,7 @@ describe('GET /api/users', () => {
 
 describe('GET /api/articles', () => {
   test('status of 200, responds with an articles array of article objects, sorted by date in descending order', () => {
-    return request.agent(app)
+    return request(app)
     .get('/api/articles')
     .expect(200)
     .then(({body}) => {
@@ -162,6 +162,58 @@ describe('GET /api/articles', () => {
           })
         )
       })
+    })
+  })
+})
+
+describe('GET /api/articles/:article_id/comments', () => {
+  test('status of 200, responds with array of comments for the given article ID', () => {
+    const articleID = 1
+    return request(app)
+    .get(`/api/articles/${articleID}/comments`)
+    .expect(200)
+    .then(({body}) => {
+      const { comments } = body;
+      expect(comments).toBeInstanceOf(Array);
+      expect(comments.length).toBe(11);
+      comments.forEach((comment) => {
+        expect(comment).toEqual(
+          expect.objectContaining({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: 1
+          })
+        )
+      })
+    })
+  })
+  test('400: responds with error message when passed a bad article ID', () => {
+    return request(app)
+    .get('/api/articles/notAnId/comments')
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe('Invalid input');
+    })
+  })
+  test('404: responds with error message when article does not exist', () => {
+    return request(app)
+    .get('/api/articles/9999999999999/comments')
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.msg).toBe('Resource not found');
+    })
+  })
+  test('200: responds with empty array of comments if the article DOES exist but does NOT have comments', () => {
+    return request(app)
+    .get('/api/articles/4/comments')
+    .expect(200)
+    .then(({body}) => {
+      const { comments } = body;
+      expect(comments).toBeInstanceOf(Array);
+      expect(comments.length).toBe(0);
     })
   })
 })

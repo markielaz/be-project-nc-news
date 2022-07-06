@@ -138,7 +138,7 @@ describe('GET /api/users', () => {
 
 describe('GET /api/articles', () => {
   test('status of 200, responds with an articles array of article objects, sorted by date in descending order', () => {
-    return request.agent(app)
+    return request(app)
     .get('/api/articles')
     .expect(200)
     .then(({body}) => {
@@ -159,6 +159,30 @@ describe('GET /api/articles', () => {
             created_at: expect.any(String),
             votes: expect.any(Number),
             comment_count: expect.any(Number)
+          })
+        )
+      })
+    })
+  })
+})
+
+describe('GET /api/articles/:article_id/comments', () => {
+  test('status of 200, responds with array of comments for the given article ID', () => {
+    const articleID = 1
+    return request(app)
+    .get(`/api/articles/${articleID}/comments`)
+    .expect(200)
+    .then(({body}) => {
+      const { comments } = body;
+      expect(comments).toBeInstanceOf(Array);
+      comments.forEach((comment) => {
+        expect(comment).toEqual(
+          expect.objectContaining({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
           })
         )
       })

@@ -52,3 +52,15 @@ exports.selectUsers = () => {
     return result.rows;
   })
 }
+
+exports.selectCommentsByArticleId = (articleID) => {
+
+  const query = `
+    SELECT * FROM comments WHERE article_id = $1;
+  `
+  return db.query(query, [articleID]).then((result) => {
+    return result.rows
+  })
+
+
+}

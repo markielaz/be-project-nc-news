@@ -174,6 +174,7 @@ describe('GET /api/articles/:article_id/comments', () => {
     .expect(200)
     .then(({body}) => {
       const { comments } = body;
+      console.log(comments);
       expect(comments).toBeInstanceOf(Array);
       expect(comments.length).toBe(11);
       comments.forEach((comment) => {
@@ -187,6 +188,22 @@ describe('GET /api/articles/:article_id/comments', () => {
           })
         )
       })
+    })
+  })
+  test('400: responds with error message when passed a bad article ID', () =>{
+    return request(app)
+    .get('/api/articles/notAnId/comments')
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe('Invalid input');
+    })
+  })
+  test('404: responds with error message when article does not exist', () =>{
+    return request(app)
+    .get('/api/articles/9999999999999/comments')
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.msg).toBe('Resource not found');
     })
   })
 })

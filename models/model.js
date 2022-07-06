@@ -6,6 +6,22 @@ exports.selectTopics = () => {
   });
 };
 
+exports.selectArticles = () => {
+  
+  const query = `
+    SELECT articles.*,
+    COUNT (comments.article_id)::INT AS comment_count
+    FROM articles
+    LEFT JOIN comments ON comments.article_id = articles.article_id
+    GROUP BY articles.article_id
+    ORDER BY created_at DESC;
+  `
+  return db.query(query).then((result) => {
+    return result.rows
+  })
+
+}
+
 exports.selectArticleById = (articleID) => {
 
   const commentQuery = `

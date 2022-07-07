@@ -49,7 +49,6 @@ exports.postComment = (req, res, next) => {
     addCommentToArticle( article_id, username, body )
       .then((comment) => res.status(201).send({comment}))
       .catch((err) => {
-        console.log(err);
         next(err);
       })
 }

@@ -7,7 +7,6 @@ exports.selectTopics = () => {
 };
 
 exports.selectArticles = () => {
-  
   const query = `
     SELECT articles.*,
     COUNT (comments.article_id)::INT AS comment_count
@@ -19,11 +18,9 @@ exports.selectArticles = () => {
   return db.query(query).then((result) => {
     return result.rows
   })
-
 }
 
 exports.selectArticleById = (articleID) => {
-
   const commentQuery = `
     SELECT articles.*,
     COUNT (comments.article_id)::INT AS comment_count
@@ -32,7 +29,6 @@ exports.selectArticleById = (articleID) => {
     WHERE articles.article_id = $1
     GROUP BY articles.article_id;
   `;
-
   return db.query(commentQuery, [articleID]).then((article) => {
     return(article.rows[0]);
   })
@@ -54,13 +50,21 @@ exports.selectUsers = () => {
 }
 
 exports.selectCommentsByArticleId = (articleID) => {
-
   const query = `
     SELECT * FROM comments WHERE article_id = $1;
   `
   return db.query(query, [articleID]).then((result) => {
     return result.rows
   })
+}
 
+exports.addCommentToArticle = (articleID, username, body) => {
 
+  const query = `
+  INSERT INTO comments (votes, author, body, article_id) VALUES (0, $1, $2, $3) RETURNING comment_id, votes, created_at, author, body;
+  `;
+  return db.query(query, [username, body, articleID])
+  .then((result) => {
+    return result.rows[0];
+  })
 }

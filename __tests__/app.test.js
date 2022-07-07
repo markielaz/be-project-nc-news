@@ -200,7 +200,7 @@ describe('GET /api/articles/:article_id/comments', () => {
   })
   test('404: responds with error message when article does not exist', () => {
     return request(app)
-    .get('/api/articles/9999999999999/comments')
+    .get('/api/articles/99999/comments')
     .expect(404)
     .then(({ body }) => {
       expect(body.msg).toBe('Resource not found');
@@ -245,10 +245,24 @@ describe('POST /api/articles/:article_id/comments', () => {
       "body": "this is a test comment"
     };
     return request(app)
-    .post('/api/articles/9999999999999/comments')
+    .post('/api/articles/99999/comments')
+    .send(newComment)
     .expect(404)
     .then(({ body }) => {
       expect(body.msg).toBe('Resource not found');
+    })
+  })
+  test('404: responds with error message when username is not in the database', () => {
+    const newComment = {
+      "username": 'test-user',
+      "body": "this is a test comment"
+    };
+    return request(app)
+    .post('/api/articles/1/comments')
+    .send(newComment)
+    .expect(404)
+    .then(({ body }) => {
+      expect(body.msg).toBe('Username not found');
     })
   })
   test('400: responds with error message when passed a bad article ID', () => {
@@ -258,44 +272,35 @@ describe('POST /api/articles/:article_id/comments', () => {
     };
     return request(app)
     .post('/api/articles/notAnId/comments')
+    .send(newComment)
     .expect(400)
     .then(({ body }) => {
       expect(body.msg).toBe('Invalid input');
     })
   })
-  // test('400: responds with error message when passed wrong data type', () => {
-  //   const newComment = {
-  //     "username": 240,
-  //     "body": "this is a test comment"
-  //   };
-  //   return request(app)
-  //   .post('/api/articles/1/comments')
-  //   .expect(400)
-  //   .then(({ body }) => {
-  //     expect(body.msg).toBe('Invalid input');
-  //   })
-  // })
-  // test('400: responds with error message when missing eg body', () => {
-  //   const newComment = {
-  //     "username": 'lurker',
-  //   };
-  //   return request(app)
-  //   .post('/api/articles/1/comments')
-  //   .expect(400)
-  //   .then(({ body }) => {
-  //     expect(body.msg).toBe('Invalid input');
-  //   })
-  // })
-  // test('400: responds with error message when username is not in the dtabase', () => {
-  //   const newComment = {
-  //     "username": 'test-user',
-  //     "body": "this is a test comment"
-  //   };
-  //   return request(app)
-  //   .post('/api/articles/1/comments')
-  //   .expect(400)
-  //   .then(({ body }) => {
-  //     expect(body.msg).toBe('Invalid input');
-  //   })
-  // })
+  test('400: responds with error message when passed wrong data type', () => {
+    const newComment = {
+      "username": 240,
+      "body": "this is a test comment"
+    };
+    return request(app)
+    .post('/api/articles/1/comments')
+    .send(newComment)
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe('Invalid input');
+    })
+  })
+  test('400: responds with error message when missing eg body', () => {
+    const newComment = {
+      "username": 'lurker',
+    };
+    return request(app)
+    .post('/api/articles/1/comments')
+    .send(newComment)
+    .expect(400)
+    .then(({ body }) => {
+      expect(body.msg).toBe('Invalid input');
+    })
+  })
 })

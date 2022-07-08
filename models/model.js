@@ -1,3 +1,4 @@
+const { query } = require("../db/connection");
 const db = require("../db/connection");
 
 exports.selectTopics = () => {
@@ -10,11 +11,25 @@ exports.selectArticles = (sortBy = 'created_at', order = 'DESC', topic) => {
 
   const validSortOptions = ['title', 'topic', 'author', 'body', 'created_at', 'votes'];
 
+  const validOrderOptions = ['ASC', 'DESC', 'asc', 'desc'];
+
   if(!validSortOptions.includes(sortBy)) {
-    return Promise.reject('Invalid sort_by query')
+    return Promise.reject({ status: 400, msg: 'Invalid sort_by query'});
   }
 
-  const queryValues = [];
+  if(!validOrderOptions.includes(order)) {
+    return Promise.reject({ status: 400, msg: 'Invalid order query'});
+  } 
+
+  const validTopics = [];
+
+  return db.query('SELECT * FROM topics').then((result) => {
+    const topicsArray = result.rows;
+    topicsArray.forEach((obj) => {
+      validTopics.push(obj.slug);
+    })
+  }).then(() => {
+    const queryValues = [];
 
   let queryStr = `
     SELECT articles.*,
@@ -25,7 +40,7 @@ exports.selectArticles = (sortBy = 'created_at', order = 'DESC', topic) => {
 
   if (topic) {
     queryValues.push(topic);
-    queryStr += ` WHERE topic = $1`;
+    queryStr += `WHERE topic = $1`;
   }
 
    queryStr += `
@@ -33,8 +48,14 @@ exports.selectArticles = (sortBy = 'created_at', order = 'DESC', topic) => {
     ORDER BY ${sortBy} ${order};
   `
 
-  return db.query(queryStr, queryValues).then((result) => {
-    return result.rows
+  return db.query(queryStr, queryValues)
+  })
+
+  .then((result) => {
+    if(!result.rows.length && !validTopics.includes(topic)) {
+      console.log('hello');
+      return Promise.reject({ status: 404, msg: 'Topic not found'});
+    }else return result.rows
   })
 }
 

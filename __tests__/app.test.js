@@ -319,7 +319,7 @@ describe("GET /api/articles (queries)", () => {
   });
   it("200: responds with a body of articles in descending order (default)", () => {
     return request(app)
-      .get("/api/articles?order=desc")
+      .get("/api/articles")
       .expect(200)
       .then(({ body }) => {
         const { articles } = body;
@@ -348,6 +348,40 @@ describe("GET /api/articles (queries)", () => {
         articles.forEach((article) => {
           expect(article.topic).toBe('mitch')
         })
-      });
-  });
+      })
+  })
+  it("200: responds with empty arr if topic is valid but no articles associated", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeInstanceOf(Array);
+        expect(articles.length).toBe(0);
+      })
+  })
+  it("404: responds with error message if non-existent topic is passed in", () => {
+    return request(app)
+      .get("/api/articles?topic=bananas")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Topic not found');
+      })
+  })
+  it("400: responds with error message if invalid sort_by passed in", () => {
+    return request(app)
+      .get("/api/articles?sort_by=bananas")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Invalid sort_by query');
+      })
+  })
+  it("400: responds with error message if invalid order passed in", () => {
+    return request(app)
+      .get("/api/articles?sort_by=author&&order=banana")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Invalid order query');
+      })
+  })
 });

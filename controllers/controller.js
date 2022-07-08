@@ -1,4 +1,4 @@
-const { selectTopics, selectArticles, selectArticleById, updateArticle, selectUsers, selectCommentsByArticleId, addCommentToArticle, checkIfUserExists } = require("../models/model");
+const { selectTopics, selectArticles, selectArticleById, updateArticle, selectUsers, selectCommentsByArticleId, addCommentToArticle, checkIfUserExists, removeComment } = require("../models/model");
 
 exports.getTopics = (req, res, next) => {
   selectTopics().then((topics) => {
@@ -57,4 +57,13 @@ exports.postComment = (req, res, next) => {
       .catch((err) => {
         next(err);
       })
+}
+
+exports.deleteComment = (req, res, next) => {
+  const {comment_id} = req.params;
+  removeComment(comment_id)
+  .then(() => {
+    res.status(204).send({})
+  })
+  .catch(next);
 }

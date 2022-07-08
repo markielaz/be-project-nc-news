@@ -148,8 +148,9 @@ exports.addCommentToArticle = (articleID, username, body) => {
     return result.rows[0];
   })
 
+}
 
-  
-
-  
+exports.removeComment = (commentID) => {
+  const query = 'DELETE FROM comments WHERE comment_id = $1;';
+  return db.query(query, [commentID]);
 }

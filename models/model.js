@@ -6,16 +6,34 @@ exports.selectTopics = () => {
   });
 };
 
-exports.selectArticles = () => {
-  const query = `
+exports.selectArticles = (sortBy = 'created_at', order = 'DESC', topic) => {
+
+  const validSortOptions = ['title', 'topic', 'author', 'body', 'created_at', 'votes'];
+
+  if(!validSortOptions.includes(sortBy)) {
+    return Promise.reject('Invalid sort_by query')
+  }
+
+  const queryValues = [];
+
+  let queryStr = `
     SELECT articles.*,
     COUNT (comments.article_id)::INT AS comment_count
     FROM articles
     LEFT JOIN comments ON comments.article_id = articles.article_id
+  `;
+
+  if (topic) {
+    queryValues.push(topic);
+    queryStr += ` WHERE topic = $1`;
+  }
+
+   queryStr += `
     GROUP BY articles.article_id
-    ORDER BY created_at DESC;
+    ORDER BY ${sortBy} ${order};
   `
-  return db.query(query).then((result) => {
+
+  return db.query(queryStr, queryValues).then((result) => {
     return result.rows
   })
 }

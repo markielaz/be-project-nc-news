@@ -304,3 +304,50 @@ describe('POST /api/articles/:article_id/comments', () => {
     })
   })
 })
+
+describe("GET /api/articles (queries)", () => {
+  it("200: responds with a body of articles sorted by [column]", () => {
+    return request(app)
+      .get("/api/articles?sort_by=author")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy('author', {
+          descending: true
+        });
+      });
+  });
+  it("200: responds with a body of articles in descending order (default)", () => {
+    return request(app)
+      .get("/api/articles?order=desc")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy('created_at', {
+          descending: true
+        });
+      });
+  });
+  it("200: responds with a body of articles in ascending order", () => {
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy('created_at', {
+          descending: false
+        });
+      });
+  });
+  it("200: responds with a body of articles filtered by topic in query", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        articles.forEach((article) => {
+          expect(article.topic).toBe('mitch')
+        })
+      });
+  });
+});

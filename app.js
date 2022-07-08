@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 
-const { getTopics, getUsers, getArticles, getArticleById, getCommentsByArticleId, postComment, patchArticle } = require("./controllers/controller");
+const { getTopics, getUsers, getArticles, getArticleById, getCommentsByArticleId, postComment, patchArticle, deleteComment } = require("./controllers/controller");
 
 app.use(express.json());
 
@@ -18,6 +18,8 @@ app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 app.post('/api/articles/:article_id/comments', postComment)
 
 app.patch("/api/articles/:article_id", patchArticle)
+
+app.delete('/api/comments/:comment_id', deleteComment);
 
 app.use("*", (req, res) => {
     res.status(404).send({msg: "Invalid Path"});

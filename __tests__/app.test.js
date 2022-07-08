@@ -385,3 +385,18 @@ describe("GET /api/articles (queries)", () => {
       })
   })
 });
+
+describe('DELETE /api/comments/:comment_id', () => {
+  test('STATUS CODE 204, delete comment that matches ID', () => {
+      const commentID = 1
+      return request(app)
+      .delete(`/api/comments/${commentID}`)
+      .expect(204)
+      .then(() => {
+          return db.query('SELECT * FROM comments WHERE comment_id = 1').then((results) => {
+              expect(results.rows).toHaveLength(0)
+          });
+      });
+  });
+  
+});

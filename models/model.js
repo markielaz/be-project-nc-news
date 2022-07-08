@@ -7,7 +7,6 @@ exports.selectTopics = () => {
 };
 
 exports.selectArticles = () => {
-  
   const query = `
     SELECT articles.*,
     COUNT (comments.article_id)::INT AS comment_count
@@ -19,11 +18,9 @@ exports.selectArticles = () => {
   return db.query(query).then((result) => {
     return result.rows
   })
-
 }
 
 exports.selectArticleById = (articleID) => {
-
   const commentQuery = `
     SELECT articles.*,
     COUNT (comments.article_id)::INT AS comment_count
@@ -32,7 +29,6 @@ exports.selectArticleById = (articleID) => {
     WHERE articles.article_id = $1
     GROUP BY articles.article_id;
   `;
-
   return db.query(commentQuery, [articleID]).then((article) => {
     return(article.rows[0]);
   })
@@ -53,14 +49,69 @@ exports.selectUsers = () => {
   })
 }
 
+exports.checkIfArticleExists = (articleID) => {
+
+  let queryStr = `SELECT * FROM articles WHERE article_id = $1`;
+  return db.query(queryStr, [articleID])
+  .then(({ rows, rowCount }) => {
+    if (rowCount === 0) {
+      return false;
+    }
+    return true;
+  })
+}
+
 exports.selectCommentsByArticleId = (articleID) => {
 
-  const query = `
-    SELECT * FROM comments WHERE article_id = $1;
-  `
-  return db.query(query, [articleID]).then((result) => {
-    return result.rows
+  return this.checkIfArticleExists(articleID).then((boolean)=> {
+    if(boolean === false) {
+      return Promise.reject({ status: 404, msg: 'Resource not found'});
+    };
+    const query = `SELECT * FROM comments WHERE article_id = $1;`
+  return db.query(query, [articleID])
+  .then((result) => {
+    return result.rows;
+  })
+  })
+  
+}
+
+exports.checkIfUserExists = (username) => {
+
+  let queryStr = `
+  SELECT * FROM users WHERE username = $1
+  `;
+
+  return db.query(queryStr, [username])
+  .then(({ rows, rowCount }) => {
+    if (rowCount === 0) {
+      return false;
+    }
+    return true;
+  })
+}
+
+exports.addCommentToArticle = (articleID, username, body) => {
+
+  if(!body || !articleID || !username || typeof username !== 'string' || typeof body !== 'string') {
+    return Promise.reject({ status: 400, msg: 'Invalid input'});
+  }
+  
+  return this.checkIfUserExists(username).then((boolean)=> {
+    if(boolean === false) {
+      return Promise.reject({ status: 404, msg: 'Username not found'});
+    };
+    const query = `
+    INSERT INTO comments (votes, author, body, article_id) VALUES (0, $1, $2, $3) RETURNING comment_id, votes, created_at, author, body;
+    `;
+    return db.query(query, [username, body, articleID])
+  })
+  .then((result) => {
+    return result.rows[0];
   })
 
 
+  
+
+  
 }

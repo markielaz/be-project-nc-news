@@ -53,7 +53,6 @@ exports.selectArticles = (sortBy = 'created_at', order = 'DESC', topic) => {
 
   .then((result) => {
     if(!result.rows.length && !validTopics.includes(topic)) {
-      console.log('hello');
       return Promise.reject({ status: 404, msg: 'Topic not found'});
     }else return result.rows
   })

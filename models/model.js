@@ -9,7 +9,7 @@ exports.selectTopics = () => {
 
 exports.selectArticles = (sortBy = 'created_at', order = 'DESC', topic) => {
 
-  const validSortOptions = ['title', 'topic', 'author', 'body', 'created_at', 'votes'];
+  const validSortOptions = ['title', 'topic', 'author', 'body', 'created_at', 'votes', 'comment_count'];
 
   const validOrderOptions = ['ASC', 'DESC', 'asc', 'desc'];
 

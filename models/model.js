@@ -77,6 +77,11 @@ exports.updateArticle = (articleID, inc_votes) => {
   return db.query(query, [articleID, inc_votes]).then(({rows}) => rows[0])
 }
 
+exports.updateComment = (commentID, inc_votes) => {
+  const query = 'UPDATE comments SET votes = votes + $2 WHERE comment_id = $1 RETURNING * ;'
+  return db.query(query, [commentID, inc_votes]).then(({rows}) => rows[0])
+}
+
 exports.selectUsers = () => {
   return db.query(
     `

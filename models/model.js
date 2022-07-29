@@ -110,7 +110,7 @@ exports.selectCommentsByArticleId = (articleID) => {
     if(boolean === false) {
       return Promise.reject({ status: 404, msg: 'Resource not found'});
     };
-    const query = `SELECT * FROM comments WHERE article_id = $1 SORT BY created_at ORDER BY DESC;`
+    const query = `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC;`
   return db.query(query, [articleID])
   .then((result) => {
     return result.rows;
